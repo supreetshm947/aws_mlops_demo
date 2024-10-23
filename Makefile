@@ -132,3 +132,25 @@ get_pods:
 
 
 # dotenv -f .env run airflow dags test training_timeout 2024-10-16T00:00:00
+
+
+setup_airflow_aws:
+	@echo "Setting up Apache Airflow..."
+	pip install apache-airflow[postgres] && \
+	export AIRFLOW_HOME=$(AIRFLOW_HOME) && \
+	airflow db init && \
+	airflow users create --username admin --firstname FIRST_NAME --lastname LAST_NAME --role Admin --email admin@example.com --password admin && \
+	# airflow webserver --daemon && \
+	# airflow scheduler --daemon && \
+	echo "Airflow setup complete. RDS connection settings added."
+
+# Create the Airflow connection to RDS
+create_rds_connection:
+	@echo "Creating RDS connection in Airflow..."
+	airflow connections add my_postgres_conn \
+		--conn-type postgres \
+		--conn-host $(RDS_HOST) \
+		--conn-login $(RDS_USER) \
+		--conn-password $(RDS_PASSWORD) \
+		--conn-schema $(RDS_DB_NAME) \
+		--conn-port $(RDS_PORT)
